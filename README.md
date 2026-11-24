@@ -4,6 +4,11 @@ Built by Drisha C · github.com/drisha-c
 
 A self-hosted web analytics tool. A small JavaScript snippet collects visits and events from any website, an Express API stores them in PostgreSQL, and a dashboard turns them into charts and tables.
 
+![Overview](docs/overview.png)
+![Acquisition](docs/acquisition.png)
+![Technology](docs/technology.png)
+
+
 What it does
 Tracker (about 4 KB): page views, single-page-app navigation, click tracking, custom events, sessions, referrers, UTM campaigns, device, browser and OS. No cookies, never reads form fields, honours Do Not Track.
 Dashboard: Overview, Audience, Pages, Events, Acquisition, Technology and Websites. Loading, empty and error states, responsive layout, keyboard-accessible, light and dark.
