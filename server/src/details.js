@@ -22,6 +22,17 @@ async function pagesAt(wid, r, dir) {
      GROUP BY 1 ORDER BY 2 DESC LIMIT 10`, [wid, r.from, r.to]);
   return rows;
 }
+
+async function timeOnPage(wid, r) {
+  const { rows } = await query(
+    `SELECT path, avg(dur)::float AS avg_time FROM (
+       SELECT path, type,
+              extract(epoch FROM lead(created_at) OVER (PARTITION BY session_id ORDER BY created_at) - created_at) AS dur
+       FROM events WHERE website_id=$1 AND ${T}) t
+     WHERE type='pageview' AND dur IS NOT NULL AND dur < 1800 GROUP BY path`, [wid, r.from, r.to]);
+  return rows;
+}
+
 async function details(wid, q) {
   const r = parseRange(q), p = [wid, r.from, r.to];
   const [nr, dur, least, entry, exit, evNames, evTotal, campaigns, referrers, sources, mediums, screens] = await Promise.all([
@@ -50,7 +61,7 @@ async function details(wid, q) {
   ]);
   return {
     audience: { returning: nr.rows[0]?.ret || 0, fresh: nr.rows[0]?.fresh || 0, durations: dur.rows },
-    pages: { least: least.rows, entry, exit },
+    pages: { least: least.rows, entry, exit, time: await timeOnPage(wid, r) },
     events: { names: evNames.rows, total: evTotal.rows[0].total, custom: evTotal.rows[0].custom },
     acquisition: { referrers, sources, mediums, campaigns: campaigns.rows },
     technology: { screens },

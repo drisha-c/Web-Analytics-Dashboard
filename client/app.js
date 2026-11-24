@@ -211,12 +211,13 @@ async function renderDetail(kind) {
         h('tbody', {}, rows.map((r) => h('tr', {}, cells(r).map((c, i) => h('td', { class: i ? 'num' : '' }, c)))))) : h('div', { class: 'inline-empty', style: 'padding:32px' }, 'No data for this period')));
     const list = (title, rows, label = 'Sessions') => tbl(title, ['Name', label], rows, (r) => [r.name, nf.format(r.value)]);
     const k = o.kpis, c = o.change, g2 = (...a) => h('div', { class: 'grid g2' }, ...a);
+    const tm = Object.fromEntries(x.pages.time.map((t) => [t.path, t.avg_time]));    
     const body = {
       audience: () => [h('div', { class: 'kpis' }, kpi('Visitors', nf.format(k.visitors), c.visitors), kpi('Sessions', nf.format(k.sessions), c.sessions),
         kpi('Page views', nf.format(k.pageviews), c.pageviews), kpi('Avg. session duration', fmtDur(k.avgDuration), c.avgDuration), kpi('Bounce rate', k.bounceRate.toFixed(1) + '%', c.bounceRate, true)),
       g2(chart('New vs returning visitors', 'nr', [{ name: 'New', value: x.audience.fresh }, { name: 'Returning', value: x.audience.returning }].filter((r) => r.value), 'donut', 'Visitors'),
         chart('Session duration', 'dur', x.audience.durations, 'bar', 'Sessions by duration'))],
-      pages: () => [tbl('Most visited pages', ['Page', 'Views', 'Visitors', 'Share'], o.pages, (p) => [p.path, nf.format(p.views), nf.format(p.visitors), p.share.toFixed(1) + '%']),
+        pages: () => [tbl('Most visited pages', ['Page', 'Views', 'Visitors', 'Share', 'Avg. time'], o.pages, (p) => [p.path, nf.format(p.views), nf.format(p.visitors), p.share.toFixed(1) + '%', tm[p.path] != null ? fmtDur(tm[p.path]) : '–']),
         h('div', { class: 'grid g2', style: 'margin-top:12px' }, tbl('Least visited pages', ['Page', 'Views', 'Visitors'], x.pages.least, (p) => [p.path, nf.format(p.views), nf.format(p.visitors)]),
           list('Entry pages', x.pages.entry), list('Exit pages', x.pages.exit))],
       events: () => [h('div', { class: 'kpis' }, h('div', { class: 'card kpi' }, h('div', { class: 'k-label' }, 'All events'), h('div', { class: 'k-value' }, nf.format(x.events.total))),
