@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pulse Analytics</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<section id="auth" hidden>
+  <form id="auth-form" class="auth-card" novalidate>
+    <div class="brand"><span class="logo" aria-hidden="true"></span>Pulse</div>
+    <h1 id="auth-title">Sign in</h1>
+    <label for="email">Email</label>
+    <input id="email" type="email" autocomplete="email" required>
+    <label for="password">Password</label>
+    <input id="password" type="password" autocomplete="current-password" minlength="8" required>
+    <p id="auth-error" class="form-error" role="alert"></p>
+    <button class="btn primary" type="submit">Continue</button>
+    <p class="muted center"><span id="auth-alt-text">New here?</span> <button type="button" class="link" id="auth-toggle">Create an account</button></p>
+  </form>
+</section>
+<div id="shell" hidden>
+  <aside id="sidebar" aria-label="Primary">
+    <div class="brand"><span class="logo" aria-hidden="true"></span><span class="label">Pulse</span></div>
+    <nav>
+      <a href="#/overview" data-route="overview"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span class="label">Overview</span></a>
+      <a href="#/audience" data-route="audience"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 20v-2a4 4 0 0 0-8 0v2M12 12a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/></svg><span class="label">Audience</span></a>
+      <a href="#/pages" data-route="pages"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l3 3v15H6zM9 11h6M9 15h6"/></svg><span class="label">Pages</span></a>
+      <a href="#/events" data-route="events"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 3L5 14h6l-1 7 8-11h-6z"/></svg><span class="label">Events</span></a>
+      <a href="#/acquisition" data-route="acquisition"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4v6h6M20 20v-6h-6M5 14a8 8 0 0 0 14 2M19 10A8 8 0 0 0 5 8"/></svg><span class="label">Acquisition</span></a>
+      <a href="#/technology" data-route="technology"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18v11H3zM8 20h8M12 16v4"/></svg><span class="label">Technology</span></a>
+      <a href="#/websites" data-route="websites"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18"/></svg><span class="label">Websites</span></a>
+    </nav>
+    <button id="collapse" class="icon-btn" aria-label="Collapse sidebar" aria-expanded="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+  </aside>
+  <div class="content">
+    <header class="topbar">
+      <button id="menu" class="icon-btn mobile-only" aria-label="Open navigation"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+      <label class="sr" for="site-select">Website</label><select id="site-select"></select>
+      <label class="sr" for="range-select">Date range</label>
+      <select id="range-select"><option value="7">Last 7 days</option><option value="30" selected>Last 30 days</option><option value="90">Last 90 days</option></select>
+      <span class="spacer"></span>
+      <span id="user-email" class="muted hide-sm"></span>
+      <button id="signout" class="btn">Sign out</button>
+    </header>
+    <main id="main" tabindex="-1"></main>
+  </div>
+</div>
+<div id="toast" role="status" aria-live="polite"></div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
