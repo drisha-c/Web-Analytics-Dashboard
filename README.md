@@ -70,4 +70,4 @@ Known limitations
 Rate limiting is in memory, so it resets on restart and isn't shared across servers.
 Login tokens are stored in the browser and logging out doesn't revoke them server-side.
 The site key is public by design; the origin check stops other domains from posting events, but a script can still fake the header.
-Not built yet: sparklines, time on page, event filtering and detail view, batch ingestion, geographic data.
+- Not built yet: event filtering and detail view, batch ingestion, geographic data.

@@ -113,12 +113,23 @@ async function renderOverview() {
     main.replaceChildren(stateBox('Could not load analytics', e.message, h('button', { class: 'btn', onclick: renderOverview }, 'Retry')));
   }
 }
-function kpi(label, value, change, invert) {
+
+function spark(vals) {
+  const NS = 'http://www.w3.org/2000/svg', w = 120, ht = 28, max = Math.max(...vals, 1);
+  const pts = vals.map((v, i) => `${(i / Math.max(vals.length - 1, 1)) * w},${ht - 2 - (v / max) * (ht - 4)}`).join(' ');
+  const svg = document.createElementNS(NS, 'svg');
+  svg.setAttribute('viewBox', `0 0 ${w} ${ht}`); svg.setAttribute('preserveAspectRatio', 'none');
+  svg.setAttribute('class', 'spark'); svg.setAttribute('aria-hidden', 'true');
+  const line = document.createElementNS(NS, 'polyline'); line.setAttribute('points', pts);
+  svg.append(line); return svg;
+}
+
+function kpi(label, value, change, invert, series) {
   const has = change != null && isFinite(change);
   const up = has && change > 0, good = invert ? !up : up;
   return h('div', { class: 'card kpi' }, h('div', { class: 'k-label' }, label), h('div', { class: 'k-value' }, value),
     h('div', { class: 'delta ' + (has && change !== 0 ? (good ? 'up' : 'down') : '') },
-      has ? `${up ? '▲' : change < 0 ? '▼' : '–'} ${Math.abs(change).toFixed(1)}% vs previous period` : 'No previous data'));
+      has ? `${up ? '▲' : change < 0 ? '▼' : '–'} ${Math.abs(change).toFixed(1)}% vs previous period` : 'No previous data'), series ? spark(series) : null);
 }
 function chartCard(title, id, label, hasData, cls = '') {
   return h('section', { class: 'card' }, h('div', { class: 'card-head' }, h('h2', {}, title)),
@@ -131,7 +142,7 @@ function draw(d, site) {
   const total = d.pages.reduce((a, p) => a + p.views, 0);
   const root = h('div', {},
     h('div', { class: 'page-head' }, h('div', {}, h('h1', {}, site.name, site.is_demo ? h('span', { class: 'badge' }, 'Demo data') : null), h('span', { class: 'muted' }, site.domain))),
-    h('div', { class: 'kpis' }, kpi('Visitors', nf.format(k.visitors), c.visitors), kpi('Page views', nf.format(k.pageviews), c.pageviews), kpi('Sessions', nf.format(k.sessions), c.sessions),
+    h('div', { class: 'kpis' }, kpi('Visitors', nf.format(k.visitors), c.visitors, false, d.series.map((r) => r.visitors)), kpi('Page views', nf.format(k.pageviews), c.pageviews, false, d.series.map((r) => r.pageviews)), kpi('Sessions', nf.format(k.sessions), c.sessions, false, d.series.map((r) => r.sessions)),
       kpi('Avg. session duration', fmtDur(k.avgDuration), c.avgDuration), kpi('Bounce rate', k.bounceRate.toFixed(1) + '%', c.bounceRate, true)),
     h('section', { class: 'card', style: 'margin-bottom:12px' }, h('div', { class: 'card-head' }, h('h2', {}, 'Traffic overview'),
       h('div', { class: 'chips', role: 'group', 'aria-label': 'Data series' }, [['Visitors', 0], ['Page views', 1], ['Sessions', 2]].map(([n, i]) =>
