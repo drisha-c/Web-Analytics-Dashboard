@@ -47,6 +47,8 @@ Add a website under Websites, copy its snippet into your site:
 html
 <script src="https://YOUR-HOST/tracker.js" data-site-id="SITE_KEY" async></script>
 
+Live demo: https://web-analytics-dashboard-va4s.onrender.com/tracker.js
+
 Custom events:
 
 js
