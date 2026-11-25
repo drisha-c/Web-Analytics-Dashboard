@@ -206,6 +206,35 @@ function drawSimple(specs) {
           scales: { x: { grid: { color: grid }, border: { display: false }, ticks: { precision: 0 } }, y: { grid: { display: false } } } } }));
   });
 }
+function eventPanel(names, qs) {
+  let page = 1, name = '';
+  const box = h('div', { class: 'table-wrap' }), info = h('span', { class: 'muted' });
+  const prev = h('button', { class: 'btn', onclick: () => { page--; load(); } }, 'Previous');
+  const next = h('button', { class: 'btn', onclick: () => { page++; load(); } }, 'Next');
+  const sel = h('select', { 'aria-label': 'Filter by event name', onchange: (e) => { name = e.target.value; page = 1; load(); } },
+    h('option', { value: '' }, 'All custom events'), names.map((n) => h('option', { value: n.name }, n.name)));
+  async function load() {
+    box.replaceChildren(h('div', { class: 'skeleton', style: 'height:120px' }));
+    try {
+      const r = await api(`/api/analytics/events?${qs}&page=${page}&limit=10&name=${encodeURIComponent(name)}`);
+      prev.disabled = page <= 1; next.disabled = page * 10 >= r.total;
+      info.textContent = r.total ? `${(page - 1) * 10 + 1}–${Math.min(page * 10, r.total)} of ${nf.format(r.total)}. Click a row for details.` : '';
+      box.replaceChildren(r.rows.length ? h('table', {}, h('thead', {}, h('tr', {}, ['Event', 'Page', 'Time', 'Device', 'Session'].map((t) => h('th', {}, t)))),
+        h('tbody', {}, r.rows.flatMap((e) => {
+          const d = h('tr', { hidden: '' }, h('td', { colspan: 5 }, h('pre', {}, JSON.stringify(e.props, null, 2))));
+          const row = h('tr', { tabindex: 0, style: 'cursor:pointer', 'aria-expanded': 'false' }, h('td', {}, e.name), h('td', {}, e.path),
+            h('td', {}, new Date(e.created_at).toLocaleString()), h('td', {}, cap(e.device)), h('td', {}, h('code', {}, e.session)));
+          const tog = () => { d.hidden = !d.hidden; row.setAttribute('aria-expanded', String(!d.hidden)); };
+          row.addEventListener('click', tog); row.addEventListener('keydown', (k) => { if (k.key === 'Enter') tog(); });
+          return [row, d];
+        })))
+        : h('div', { class: 'inline-empty', style: 'padding:32px' }, 'No events match this filter'));
+    } catch (e) { box.replaceChildren(h('div', { class: 'state' }, e.message, h('br'), h('button', { class: 'btn', onclick: load }, 'Retry'))); }
+  }
+  load();
+  return h('section', { class: 'card' }, h('div', { class: 'card-head' }, h('h2', {}, 'Event log'), sel), box,
+    h('div', { class: 'card-head', style: 'margin:12px 0 0' }, info, h('div', {}, prev, ' ', next)));
+}
 async function renderDetail(kind) {
   const main = $('#main'), run = S.run; main.replaceChildren();
   if (!S.sites.length) return main.append(stateBox('No websites yet', 'Add a website to see analytics.', h('a', { class: 'btn primary', href: '#/websites' }, 'Add a website')));
@@ -234,7 +263,7 @@ async function renderDetail(kind) {
       events: () => [h('div', { class: 'kpis' }, h('div', { class: 'card kpi' }, h('div', { class: 'k-label' }, 'All events'), h('div', { class: 'k-value' }, nf.format(x.events.total))),
         h('div', { class: 'card kpi' }, h('div', { class: 'k-label' }, 'Custom events'), h('div', { class: 'k-value' }, nf.format(x.events.custom)))),
       g2(chart('Event distribution', 'ev', x.events.names, 'bar', 'Events by name'), list('Custom events', x.events.names, 'Count')),
-      tbl('Recent events', ['Event', 'Page', 'Time'], o.recent, (e) => [e.name, e.path, new Date(e.created_at).toLocaleString()])],
+      eventPanel(x.events.names, qs)],
       acquisition: () => [g2(chart('Traffic sources', 'ch', o.channels, 'donut', 'Sessions by channel'), list('Referrers', x.acquisition.referrers)),
         h('div', { class: 'grid g2', style: 'margin-top:12px' }, list('UTM source', x.acquisition.sources), list('UTM medium', x.acquisition.mediums)),
         tbl('Campaign performance', ['Campaign', 'Source', 'Medium', 'Sessions', 'Visitors'], x.acquisition.campaigns, (r) => [r.name, r.source, r.medium, nf.format(r.sessions), nf.format(r.visitors)])],

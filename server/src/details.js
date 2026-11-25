@@ -33,6 +33,20 @@ async function timeOnPage(wid, r) {
   return rows;
 }
 
+async function eventList(wid, q) {
+  const r = parseRange(q);
+  const limit = Math.min(Math.max(parseInt(q.limit, 10) || 10, 1), 50);
+  const page = Math.max(parseInt(q.page, 10) || 1, 1);
+  const name = typeof q.name === 'string' && q.name ? q.name.slice(0, 100) : null;
+  const { rows } = await query(
+    `SELECT e.name, e.path, e.props, e.created_at, left(e.session_id::text, 8) AS session, s.device, count(*) OVER()::int AS total
+     FROM events e JOIN sessions s ON s.website_id=e.website_id AND s.id=e.session_id
+     WHERE e.website_id=$1 AND e.type='event' AND e.created_at>=$2::timestamptz AND e.created_at<$3::timestamptz
+       AND ($4::text IS NULL OR e.name=$4::text)
+     ORDER BY e.created_at DESC LIMIT $5 OFFSET $6`, [wid, r.from, r.to, name, limit, (page - 1) * limit]);
+  return { total: rows[0] ? rows[0].total : 0, page, limit, rows: rows.map(({ total, ...x }) => x) };
+}
+
 async function details(wid, q) {
   const r = parseRange(q), p = [wid, r.from, r.to];
   const [nr, dur, least, entry, exit, evNames, evTotal, campaigns, referrers, sources, mediums, screens] = await Promise.all([
@@ -67,4 +81,4 @@ async function details(wid, q) {
     technology: { screens },
   };
 }
-module.exports = { details };
+module.exports = { details, eventList };

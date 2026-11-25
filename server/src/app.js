@@ -5,7 +5,8 @@ const { query } = require('./db');
 const auth = require('./auth');
 const { parseUA, channel } = require('./ua');
 const { overview } = require('./analytics');
-const { details } = require('./details');
+const { details, eventList } = require('./details');
+
 
 const app = express();
 app.disable('x-powered-by');
@@ -138,6 +139,12 @@ app.get('/api/analytics/details', auth.requireAuth, wrap(async (req, res) => {
 
 app.get('/api/openapi.json', (req, res) => res.json(require('./openapi')));
 app.get('/api/docs', (req, res) => res.type('html').send(`<!doctype html><title>Pulse API docs</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.17.14/swagger-ui.css"><div id="ui"></div><script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.17.14/swagger-ui-bundle.js"></script><script>SwaggerUIBundle({url:'/api/openapi.json',dom_id:'#ui'})</script>`));
+app.get('/api/analytics/events', auth.requireAuth, wrap(async (req, res) => {
+  const wid = +req.query.websiteId;
+  const own = wid && (await query('SELECT 1 FROM websites WHERE id=$1 AND user_id=$2', [wid, req.userId])).rowCount;
+  if (!own) return res.status(404).json({ error: 'Website not found' });
+  res.json({ data: await eventList(wid, req.query) });
+}));
 app.get('/tracker.js', (req, res) => { res.set('Cache-Control', 'public, max-age=3600'); res.sendFile(path.join(__dirname, '../../tracker/analytics.js')); });
 app.use(express.static(path.join(__dirname, '../../client')));
 app.use('/api', (req, res) => res.status(404).json({ error: 'Not found' }));
