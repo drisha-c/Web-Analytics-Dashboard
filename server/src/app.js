@@ -145,6 +145,7 @@ app.get('/api/analytics/events', auth.requireAuth, wrap(async (req, res) => {
   if (!own) return res.status(404).json({ error: 'Website not found' });
   res.json({ data: await eventList(wid, req.query) });
 }));
+app.get('/health', wrap(async (req, res) => { await query('SELECT 1'); res.json({ ok: true }); }));
 app.get('/tracker.js', (req, res) => { res.set('Cache-Control', 'public, max-age=3600'); res.sendFile(path.join(__dirname, '../../tracker/analytics.js')); });
 app.use(express.static(path.join(__dirname, '../../client')));
 app.use('/api', (req, res) => res.status(404).json({ error: 'Not found' }));

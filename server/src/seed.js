@@ -7,6 +7,7 @@ if (process.env.NODE_ENV === 'production' && process.env.ALLOW_DEMO_SEED !== 'tr
   console.error('Refusing to seed demo data in production.'); process.exit(1);
 }
 
+
 const EMAIL = 'demo@example.com', PASSWORD = 'demo12345', DAYS = 30;
 const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 const wpick = (pairs) => { let r = Math.random() * pairs.reduce((a, p) => a + p[1], 0); for (const [v, w] of pairs) if ((r -= w) < 0) return v; return pairs[0][0]; };

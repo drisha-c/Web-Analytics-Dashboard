@@ -25,6 +25,7 @@ module.exports = {
     '/api/websites/{id}': { delete: { tags: ['Websites'], summary: 'Delete a website and all its data', security: sec, parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }], responses: { ...ok('Deleted'), ...err(401, 404) } } },
     '/api/events/collect': { post: { tags: ['Ingestion'], summary: 'Record one event (public, rate-limited; Origin must match the site domain)', requestBody: { required: true, content: json(event) }, responses: { ...ok('Accepted', 202), ...err(400, 403, 404, 429) } } },
     '/api/analytics/overview': { get: { tags: ['Analytics'], summary: 'KPIs with period comparison, daily series, top pages, channels, devices, browsers, OS, recent events', security: sec, parameters: range, responses: { ...ok('Overview'), ...err(400, 401, 404) } } },
+    '/api/analytics/events': { get: { tags: ['Analytics'], summary: 'Paginated custom event log, optionally filtered by name', security: sec, parameters: [...range, q('name', 'Event name filter'), q('page', 'Page number (default 1)'), q('limit', 'Rows per page (default 10, max 50)')], responses: { ...ok('Events'), ...err(400, 401, 404) } } },
     '/api/analytics/details': { get: { tags: ['Analytics'], summary: 'Audience, pages, events, acquisition and technology breakdowns', security: sec, parameters: range, responses: { ...ok('Details'), ...err(400, 401, 404) } } },
   },
 };
