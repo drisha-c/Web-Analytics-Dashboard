@@ -129,7 +129,7 @@ function kpi(label, value, change, invert, series) {
   const up = has && change > 0, good = invert ? !up : up;
   return h('div', { class: 'card kpi' }, h('div', { class: 'k-label' }, label), h('div', { class: 'k-value' }, value),
     h('div', { class: 'delta ' + (has && change !== 0 ? (good ? 'up' : 'down') : '') },
-      has ? `${up ? '▲' : change < 0 ? '▼' : '–'} ${Math.abs(change).toFixed(1)}% vs previous period` : 'No previous data'), series ? spark(series) : null);
+      has ? `${up ? '▲' : change < 0 ? '▼' : '–'} ${Math.abs(change).toFixed(1)}% vs prev` : 'No previous data'), series ? spark(series) : null);
 }
 function chartCard(title, id, label, hasData, cls = '') {
   return h('section', { class: 'card' }, h('div', { class: 'card-head' }, h('h2', {}, title)),

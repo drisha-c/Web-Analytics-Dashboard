@@ -8,7 +8,7 @@ if (process.env.NODE_ENV === 'production' && process.env.ALLOW_DEMO_SEED !== 'tr
 }
 
 
-const EMAIL = 'demo@example.com', PASSWORD = 'demo12345', DAYS = 30;
+const EMAIL = 'demo@example.com', PASSWORD = 'demo12345', DAYS = 60;
 const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 const wpick = (pairs) => { let r = Math.random() * pairs.reduce((a, p) => a + p[1], 0); for (const [v, w] of pairs) if ((r -= w) < 0) return v; return pairs[0][0]; };
 const PAGES = [['/', 'Home', 30], ['/pricing', 'Pricing', 14], ['/blog/getting-started', 'Getting started', 12], ['/features', 'Features', 12], ['/docs', 'Documentation', 10], ['/about', 'About', 5], ['/contact', 'Contact', 4], ['/blog/analytics-101', 'Analytics 101', 8]];

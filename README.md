@@ -4,6 +4,9 @@ Built by Drisha C · github.com/drisha-c
 
 A self-hosted web analytics tool. A small JavaScript snippet collects visits and events from any website, an Express API stores them in PostgreSQL, and a dashboard turns them into charts and tables.
 
+**Live demo:** https://web-analytics-dashboard-va4s.onrender.com
+"Create an account to try it."
+
 ![Overview](docs/overview.png)
 ![Acquisition](docs/acquisition.png)
 ![Technology](docs/technology.png)
@@ -46,8 +49,6 @@ Add a website under Websites, copy its snippet into your site:
 
 html
 <script src="https://YOUR-HOST/tracker.js" data-site-id="SITE_KEY" async></script>
-
-Live demo: https://web-analytics-dashboard-va4s.onrender.com/tracker.js
 
 Custom events:
 
